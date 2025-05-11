@@ -20,7 +20,17 @@ const userSchema = new mongoose.Schema({
     },
     refreshToken: {
         type: String,
-      }
+      },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    surname: {
+        type: String,
+        required: true,
+        trim: true,
+    }
       
 }, { timestamps: true });
 

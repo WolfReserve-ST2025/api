@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
 const authRoutes = require('./src/routes/authRoutes');
+const userRoutes = require('./src/routes/userRoutes');
 const app = express();
 
 // Middlewares
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // app.use('/api/auth', require('./routes/authRoutes'));
 // app.use('/api/rooms', require('./routes/roomRoutes'));

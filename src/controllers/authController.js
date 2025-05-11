@@ -5,7 +5,7 @@ const { generateAccessToken, generateRefreshToken } = require('../utils/tokenUti
 
 // Register
 exports.register = async (req, res) => {
-    const { email, password, role } = req.body;
+    const { email, password, role, name, surname } = req.body; 
 
     try {
         const userExists = await User.findOne({ email });
@@ -13,12 +13,14 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        const user = await User.create({ email, password, role });
+        const user = await User.create({ email, password, role, name, surname });
         res.status(201).json({
             _id: user._id,
             email: user.email,
             role: user.role,
-            token: generateToken(user)
+            name: user.name,
+            surname: user.surname,
+            token: generateAccessToken(user)
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

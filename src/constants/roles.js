@@ -1,7 +1,7 @@
 const ROLES = {
-    HOTEL: 'Hotel',
-    KUHAR: 'Kuhar',
-    UPORABNIK: 'Uporabnik',
+    hotel: 'Hotel',
+    chef: 'chef',
+    user: 'User',
 };
 
 module.exports = ROLES;
