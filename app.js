@@ -3,6 +3,8 @@ const cors = require('cors');
 const passport = require('passport');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const roomRoutes = require('./src/routes/roomRoutes');
+const reservationRoutes = require('./src/routes/reservationRoutes');
 const app = express();
 
 // Middlewares
@@ -15,13 +17,10 @@ app.get('/', (req, res) => {
     res.send('Hello from WolfReserve backend!');
 });
 
-
-
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-
-// app.use('/api/auth', require('./routes/authRoutes'));
-// app.use('/api/rooms', require('./routes/roomRoutes'));
+app.use('/api/rooms', roomRoutes);
+app.use('/api/reservations', reservationRoutes);
 // app.use('/api/foods', require('./routes/foodRoutes'));
 // app.use('/api/orders', require('./routes/orderRoutes'));
 
