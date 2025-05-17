@@ -3,6 +3,9 @@ const cors = require('cors');
 const passport = require('passport');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const foodRoutes = require('./src/routes/foodRoutes');
+const orderRoutes = require('./src/routes/orderRoutes');
+
 const app = express();
 
 // Middlewares
@@ -22,8 +25,8 @@ app.use('/api/users', userRoutes);
 
 // app.use('/api/auth', require('./routes/authRoutes'));
 // app.use('/api/rooms', require('./routes/roomRoutes'));
-// app.use('/api/foods', require('./routes/foodRoutes'));
-// app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/foods', foodRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 module.exports = app;
