@@ -9,7 +9,7 @@ const foodSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
-        min: 0, // Cena ne sme biti negativna
+        min: 0, 
     },
     description: {
         type: String,

@@ -5,6 +5,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const foodRoutes = require('./src/routes/foodRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
+const path = require('path');
 
 const app = express();
 
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
     res.send('Hello from WolfReserve backend!');
 });
 
-
+app.use('/api/uploads/foods', express.static(path.join(__dirname, 'src/uploads/foods')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

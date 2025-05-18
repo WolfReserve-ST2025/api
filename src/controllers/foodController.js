@@ -17,8 +17,10 @@ exports.createFood = async (req, res) => {
         return res.status(403).json({ message: 'Access denied. Only chefs can create food.' })
     }
 
-    const { name, price, description, imageUrl } = req.body;
+    const { name, price, description } = req.body;
+    const imageUrl = req.file ? `/api/uploads/foods/${req.file.filename}` : null
 
+    console.log(imageUrl)
     try {
         const existingFood = await Food.findOne({ name });
 
@@ -48,7 +50,7 @@ exports.deleteFood = async (req, res) => {
         return res.status(403).json({ message: 'Access denied. Only chefs can delete food.' });
     }
 
-    const { food_id } = req.params.id;
+    const { food_id } = req.params;
 
     try {
         const food = await Food.findByIdAndDelete(food_id);
