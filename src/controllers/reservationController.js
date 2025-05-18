@@ -58,6 +58,9 @@ exports.createReservation = async (req, res) => {
             return res.status(404).json({ message: 'Room not found' });
         }
 
+        const reservedDateFromDate = new Date(reservedDateFrom);
+        const reservedDateToDate = new Date(reservedDateTo);
+
         const existingReservation = await Reservation.findOne({
             roomId: roomId,
             reservedDateFrom: { $lte: reservedDateToDate },
@@ -69,8 +72,7 @@ exports.createReservation = async (req, res) => {
         }
 
         const pricePerNight = room.pricePerNight;
-        const reservedDateFromDate = new Date(reservedDateFrom);
-        const reservedDateToDate = new Date(reservedDateTo);
+       
         const timeDiff = Math.abs(reservedDateToDate - reservedDateFromDate);
         const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
         const totalPrice = diffDays * pricePerNight;
