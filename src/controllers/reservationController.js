@@ -1,4 +1,5 @@
 const Reservation = require("../models/Reservation")
+const Room = require("../models/Room")
 
 // Get all reservations
 exports.getAllReservations = async (req, res) => {
@@ -6,8 +7,6 @@ exports.getAllReservations = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // if role is user show only users is is hotel show all reservations which rooms are linked with userId via room
-
         if (role === 'User') {
             const reservations = await Reservation.find({ userId: userId })
                 .populate('roomId')
@@ -34,7 +33,10 @@ exports.getAllReservations = async (req, res) => {
 // Get reservation by ID
 exports.getReservationById = async (req, res) => {
     try {
-        const reservation = await Reservation.findById(req.params.id).populate('roomId').populate('userId');
+        const reservation = await Reservation.findById(req.params.id)
+        .populate('roomId')
+        .populate('userId');
+
         if (!reservation) {
             return res.status(404).json({ message: 'Reservation not found' });
         }
@@ -46,10 +48,33 @@ exports.getReservationById = async (req, res) => {
 
 // Create a new reservation get user Id from token
 exports.createReservation = async (req, res) => {
-    const { personCount, totalPrice, reservedDateFrom, reservedDateTo, roomId } = req.body;
+    const { personCount, reservedDateFrom, reservedDateTo, roomId } = req.body;
     const userId = req.user.id;
 
     try {
+
+        const room = await Room.findById(roomId);
+        if (!room) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+
+        const existingReservation = await Reservation.findOne({
+            roomId: roomId,
+            reservedDateFrom: { $lte: reservedDateToDate },
+            reservedDateTo: { $gte: reservedDateFromDate }
+        });
+
+        if (existingReservation) {
+            return res.status(400).json({ message: 'Room is already reserved for the selected dates' });
+        }
+
+        const pricePerNight = room.pricePerNight;
+        const reservedDateFromDate = new Date(reservedDateFrom);
+        const reservedDateToDate = new Date(reservedDateTo);
+        const timeDiff = Math.abs(reservedDateToDate - reservedDateFromDate);
+        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        const totalPrice = diffDays * pricePerNight;
+
         const newReservation = new Reservation({
             personCount,
             totalPrice,
@@ -75,6 +100,39 @@ exports.reserveRoom = async (req, res) => {
             { isReserved: true },
             { new: true }
         );
+
+        if (!reservation) {
+            return res.status(404).json({ message: 'Reservation not found' });
+        }
+
+        res.json(reservation);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.cancelReservation = async (req, res) => {
+    try {
+        const reservation = await Reservation.findByIdAndUpdate(
+            req.params.id,
+            { isAccepted: false },
+            { isReserved: false }
+        );
+
+        if (!reservation) {
+            return res.status(404).json({ message: 'Reservation not found' });
+        }
+
+        res.json(reservation);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+// delete reservation
+exports.deleteReservation = async (req, res) => {
+    try {
+        const reservation = await Reservation.findByIdAndDelete(req.params.id);
 
         if (!reservation) {
             return res.status(404).json({ message: 'Reservation not found' });

@@ -1,8 +1,24 @@
 const Room = require('../models/Room');
 
-// Get all rooms
-exports.getAllRooms = async (req, res) => {
+// Get all rooms 
+exports.getAllRoomsWithUser = async (req, res) => {
     try {
+        const rooms = await Room.find().populate('user', 'name');
+        res.json(rooms);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+exports.getAllRooms = async (req, res) => {
+    const role = req.user.role;
+    const userId = req.user.id;
+
+    try {
+        if(role === 'Hotel') {
+            const rooms = await Room.find({ userId: userId });
+            return res.json(rooms);
+        }
+
         const rooms = await Room.find();
         res.json(rooms);
     } catch (error) {
@@ -26,6 +42,7 @@ exports.getRoomById = async (req, res) => {
 exports.createRoom = async (req, res) => {
     const { name, type, description, pricePerNight, maxPersonCount, imgUrl } = req.body;
 
+    const userId = req.user.id;
     try {
         const newRoom = new Room({
             name,
@@ -33,7 +50,8 @@ exports.createRoom = async (req, res) => {
             description,
             pricePerNight,
             maxPersonCount,
-            imgUrl
+            imgUrl,
+            userId,
         });
 
         await newRoom.save();
