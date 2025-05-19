@@ -19,7 +19,9 @@ exports.getAllRooms = async (req, res) => {
             return res.json(rooms);
         }
 
-        const rooms = await Room.find();
+        const rooms = await Room.find()
+            .populate('userId');
+            
         res.json(rooms);
     } catch (error) {
         res.status(500).json({ message: error.message });

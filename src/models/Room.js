@@ -28,7 +28,7 @@ const roomSchema = new mongoose.Schema({
     }],
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
     },
 }, { timestamps: true });
 
