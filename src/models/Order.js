@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'rejected'], 
-        default: 'pending', 
+        enum: ['draft', 'pending', 'confirmed', 'rejected'], 
+        default: 'draft', 
         required: true,
     },
     foods: [

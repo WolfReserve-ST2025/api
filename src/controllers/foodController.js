@@ -17,10 +17,10 @@ exports.createFood = async (req, res) => {
         return res.status(403).json({ message: 'Access denied. Only chefs can create food.' })
     }
 
-    const { name, price, description } = req.body;
+    const { name, price, description, type } = req.body;
     const imageUrl = req.file ? `/api/uploads/foods/${req.file.filename}` : null
 
-    console.log(imageUrl)
+    console.log(type)
     try {
         const existingFood = await Food.findOne({ name });
 
@@ -32,6 +32,7 @@ exports.createFood = async (req, res) => {
             name,
             price,
             description,
+            type,
             imageUrl
         })
 
@@ -73,13 +74,13 @@ exports.updateFood = async (req, res) => {
     }
 
     const { food_id } = req.params;
-    const { name, price, description, imageUrl } = req.body;
+    const { name, price, description, imageUrl, type} = req.body;
 
     try {
 
         const updatedFood = await Food.findByIdAndUpdate(
             food_id,
-            { name, price, description, imageUrl },
+            { name, price, description, imageUrl ,type},
             { new: true, runValidators: true }
         );
 
@@ -92,3 +93,13 @@ exports.updateFood = async (req, res) => {
         res.status(500).json({ message: 'Failed to update food', error: error.message });
     }
 };
+
+exports.distinctTypes = async (req,res) => {
+    try {
+    const types = await Food.distinct('type');
+    console.log(types);
+    res.status(200).json(types);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch types' });
+  }
+}
