@@ -74,13 +74,22 @@ exports.updateFood = async (req, res) => {
     }
 
     const { food_id } = req.params;
-    const { name, price, description, imageUrl, type} = req.body;
+    const { name, price, description, type } = req.body;
 
+    let imageUrl;
+
+    if(req.file){
+        imageUrl = `/api/uploads/foods/${req.file.filename}`
+    }else{
+        const existingFood = await Food.findById(food_id)
+        imageUrl = existingFood ? existingFood.imageUrl : null;
+    }
+    console.log(imageUrl)
     try {
 
         const updatedFood = await Food.findByIdAndUpdate(
             food_id,
-            { name, price, description, imageUrl ,type},
+            { name, price, description, imageUrl, type },
             { new: true, runValidators: true }
         );
 
@@ -94,12 +103,12 @@ exports.updateFood = async (req, res) => {
     }
 };
 
-exports.distinctTypes = async (req,res) => {
+exports.distinctTypes = async (req, res) => {
     try {
-    const types = await Food.distinct('type');
-    console.log(types);
-    res.status(200).json(types);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch types' });
-  }
+        const types = await Food.distinct('type');
+        console.log(types);
+        res.status(200).json(types);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch types' });
+    }
 }
