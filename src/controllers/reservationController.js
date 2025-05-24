@@ -14,9 +14,15 @@ exports.getAllReservations = async (req, res) => {
             return res.json(reservations);
         }
         if (role === 'Hotel') {
-            const reservations = await Reservation.find({ roomId: { $in: userId } })
+
+            const rooms = await Room.find({ userId: userId });
+
+            const roomIds = rooms.map(room => room._id);
+
+            const reservations = await Reservation.find({ roomId: { $in: roomIds } })
                 .populate('roomId')
                 .populate('userId');
+
             return res.json(reservations);
         }
 
