@@ -5,6 +5,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const foodRoutes = require('./src/routes/foodRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
+const subscriptionRoutes = require('./src/routes/subscriptionRoutes');
 const path = require('path');
 
 const roomRoutes = require('./src/routes/roomRoutes');
@@ -29,6 +30,7 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 
 module.exports = app;

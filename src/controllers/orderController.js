@@ -1,6 +1,8 @@
 const Food = require('../models/Food')
 const Order = require('../models/Order');
+const Subscription = require('../models/Subscription');
 const { createFood } = require('./foodController');
+const { sendPushNotification } = require('../utils/pushNotifications');
 
 exports.getAllOrders = async (req, res) => {
     const role = req.user.role;
@@ -23,7 +25,7 @@ exports.getOrderByUser = async (req, res) => {
     const id = req.user.id;
 
     try {
-        const order = await Order.find({ user: id, status: { $in: ['pending', 'confirmed', 'rejected']} }).populate('foods.food');
+        const order = await Order.find({ user: id, status: { $in: ['pending', 'confirmed', 'rejected'] } }).populate('foods.food');
         res.status(200).json(order);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch order', error: error.message });
@@ -35,7 +37,7 @@ exports.getDraftOrder = async (req, res) => {
     const id = req.user.id;
 
     try {
-        const order = await Order.find({ user: id, status: 'draft'}).populate('foods.food');
+        const order = await Order.find({ user: id, status: 'draft' }).populate('foods.food');
         res.status(200).json(order);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch order', error: error.message });
@@ -47,7 +49,7 @@ exports.addFood = async (req, res) => {
     const id = req.user.id;
 
     const { food_id } = req.params;
-    const {quantity} = req.body;
+    const { quantity } = req.body;
     console.log(quantity)
     if (role !== 'User') {
         return res.status(403).json({ message: 'Access denied. Only users can order food.' })
@@ -61,7 +63,7 @@ exports.addFood = async (req, res) => {
         }
 
         let order = await Order.findOne({ user: id, status: 'draft' })
-        
+
         if (order) {
             const alreadyInOrder = order.foods.some(f => f.food.toString() === food_id);
             if (alreadyInOrder) {
@@ -71,7 +73,7 @@ exports.addFood = async (req, res) => {
             order.foods.push({ food: food_id, quantity: quantity });
             await order.save()
             const populatedOrder = await Order.findById(order._id).populate('foods.food');
-            
+
             return res.status(200).json({ message: 'Food added to existing order.', order: populatedOrder });
         } else {
             console.log("x")
@@ -105,7 +107,7 @@ exports.removeFood = async (req, res) => {
 
     try {
         const foodExists = await Food.findById(food_id)
-        
+
         if (!foodExists) {
             return res.status(400).json({ message: 'Food not found.' })
         }
@@ -122,7 +124,7 @@ exports.removeFood = async (req, res) => {
             } else {
                 return res.status(404).json({ message: 'Food not found in order.' });
             }
-        } 
+        }
 
 
     } catch (error) {
@@ -182,6 +184,19 @@ exports.confirmRejectOrder = async (req, res) => {
 
         if (!updatedOrder) {
             return res.status(404).json({ message: 'Order not found.' });
+        }
+
+        // Push notification send
+        const subscriptionRecord = await Subscription.findOne({ userId: updatedOrder.user });
+
+        if (subscriptionRecord) {
+            const { endpoint, expirationTime, keys } = subscriptionRecord;
+            const payload = {
+                title: "Order Update",
+                body: `Your order was ${status} by the chef.`,
+            };
+
+            await sendPushNotification({ endpoint, expirationTime, keys }, payload);
         }
 
         res.status(200).json({ message: `Order ${status} successfully.`, order: updatedOrder });
