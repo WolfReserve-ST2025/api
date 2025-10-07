@@ -13,7 +13,9 @@ const reservationRoutes = require('./src/routes/reservationRoutes');
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: "https://web-j2s6.onrender.com",
+}));
 app.use(express.json());
 app.use(passport.initialize());
 
