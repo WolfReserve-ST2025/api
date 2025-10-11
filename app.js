@@ -14,7 +14,10 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: "https://web-j2s6.onrender.com",
+  origin: [
+  "https://web-j2s6.onrender.com",
+  "http://localhost:3000",
+],
 }));
 app.use(express.json());
 app.use(passport.initialize());
